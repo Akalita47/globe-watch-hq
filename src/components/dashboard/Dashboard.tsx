@@ -3,6 +3,7 @@ import { WorldMap } from './WorldMap';
 import { Sidebar } from './Sidebar';
 import { EventsFeed } from './EventsFeed';
 import { Header } from './Header';
+import { N8nAutomationHub } from '../automation/N8nAutomationHub';
 import { Event, FilterState } from '@/types/events';
 import { sampleEvents } from '@/data/sampleEvents';
 import { useToast } from '@/hooks/use-toast';
@@ -11,6 +12,7 @@ export const Dashboard = () => {
   const [events, setEvents] = useState<Event[]>(sampleEvents);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [showAutomationHub, setShowAutomationHub] = useState(false);
   const { toast } = useToast();
   
   const [filters, setFilters] = useState<FilterState>({
@@ -114,6 +116,7 @@ export const Dashboard = () => {
         totalEvents={totalEvents}
         criticalEvents={criticalEvents}
         onCreateReport={handleCreateReport}
+        onOpenAutomation={() => setShowAutomationHub(true)}
       />
 
       {/* Main Content */}
@@ -179,6 +182,14 @@ export const Dashboard = () => {
           selectedEventId={selectedEvent?.id}
         />
       </div>
+
+      {/* n8n Automation Hub Modal */}
+      {showAutomationHub && (
+        <N8nAutomationHub
+          onClose={() => setShowAutomationHub(false)}
+          events={filteredEvents}
+        />
+      )}
     </div>
   );
 };

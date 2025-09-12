@@ -9,7 +9,9 @@ import {
   Bell, 
   Plus,
   Download,
-  Activity
+  Activity,
+  Workflow,
+  Zap
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -19,6 +21,7 @@ interface HeaderProps {
   totalEvents: number;
   criticalEvents: number;
   onCreateReport?: () => void;
+  onOpenAutomation?: () => void;
 }
 
 export const Header = ({ 
@@ -26,7 +29,8 @@ export const Header = ({
   isRefreshing = false, 
   totalEvents, 
   criticalEvents,
-  onCreateReport 
+  onCreateReport,
+  onOpenAutomation
 }: HeaderProps) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [lastRefresh, setLastRefresh] = useState(new Date());
@@ -112,6 +116,16 @@ export const Header = ({
             >
               <RefreshCw className={cn("w-4 h-4 mr-2", isRefreshing && "animate-spin")} />
               Refresh
+            </Button>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onOpenAutomation}
+              className="bg-background/50 hover:bg-background/80"
+            >
+              <Workflow className="w-4 h-4 mr-2" />
+              n8n Automation
             </Button>
 
             <Button
