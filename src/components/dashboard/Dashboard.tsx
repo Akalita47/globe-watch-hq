@@ -4,6 +4,8 @@ import { Sidebar } from './Sidebar';
 import { EventsFeed } from './EventsFeed';
 import { Header } from './Header';
 import { N8nAutomationHub } from '../automation/N8nAutomationHub';
+import { AdvancedAnalytics } from '../analytics/AdvancedAnalytics';
+import { ExportManager } from '../enterprise/ExportManager';
 import { Event, FilterState } from '@/types/events';
 import { sampleEvents } from '@/data/sampleEvents';
 import { useToast } from '@/hooks/use-toast';
@@ -13,6 +15,8 @@ export const Dashboard = () => {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showAutomationHub, setShowAutomationHub] = useState(false);
+  const [showAdvancedAnalytics, setShowAdvancedAnalytics] = useState(false);
+  const [showExportManager, setShowExportManager] = useState(false);
   const { toast } = useToast();
   
   const [filters, setFilters] = useState<FilterState>({
@@ -117,6 +121,8 @@ export const Dashboard = () => {
         criticalEvents={criticalEvents}
         onCreateReport={handleCreateReport}
         onOpenAutomation={() => setShowAutomationHub(true)}
+        onOpenAnalytics={() => setShowAdvancedAnalytics(true)}
+        onOpenExport={() => setShowExportManager(true)}
       />
 
       {/* Main Content - Responsive Layout */}
@@ -187,6 +193,25 @@ export const Dashboard = () => {
           />
         </div>
       </div>
+
+      {/* Advanced Analytics Overlay */}
+      <AdvancedAnalytics
+        events={filteredEvents}
+        isVisible={showAdvancedAnalytics}
+      />
+      {showAdvancedAnalytics && (
+        <div 
+          className="fixed inset-0 bg-black/20 z-40" 
+          onClick={() => setShowAdvancedAnalytics(false)}
+        />
+      )}
+
+      {/* Export Manager Modal */}
+      <ExportManager
+        events={filteredEvents}
+        isVisible={showExportManager}
+        onClose={() => setShowExportManager(false)}
+      />
 
       {/* n8n Automation Hub Modal */}
       {showAutomationHub && (

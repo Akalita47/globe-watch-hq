@@ -11,7 +11,9 @@ import {
   Download,
   Activity,
   Workflow,
-  Zap
+  Zap,
+  Brain,
+  FileText
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -22,6 +24,8 @@ interface HeaderProps {
   criticalEvents: number;
   onCreateReport?: () => void;
   onOpenAutomation?: () => void;
+  onOpenAnalytics?: () => void;
+  onOpenExport?: () => void;
 }
 
 export const Header = ({ 
@@ -30,7 +34,9 @@ export const Header = ({
   totalEvents, 
   criticalEvents,
   onCreateReport,
-  onOpenAutomation
+  onOpenAutomation,
+  onOpenAnalytics,
+  onOpenExport
 }: HeaderProps) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [lastRefresh, setLastRefresh] = useState(new Date());
@@ -60,12 +66,12 @@ export const Header = ({
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-3">
             <h1 className="text-xl font-bold text-foreground">
-              OSINT Geopolitical Dashboard
+              Global Intelligence Desk - Enterprise
             </h1>
             <div className="flex items-center gap-2">
-              <Badge variant="outline" className="text-xs">
+              <Badge variant="outline" className="text-xs bg-primary/10 text-primary border-primary/20">
                 <Activity className="w-3 h-3 mr-1" />
-                Live
+                Enterprise
               </Badge>
               {criticalEvents > 0 && (
                 <Badge variant="destructive" className="text-xs animate-pulse">
@@ -121,11 +127,31 @@ export const Header = ({
             <Button
               variant="outline"
               size="sm"
+              onClick={onOpenAnalytics}
+              className="bg-background/50 hover:bg-blue-500/10 border-blue-500/20"
+            >
+              <Brain className="w-4 h-4 mr-2" />
+              AI Analytics
+            </Button>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onOpenExport}
+              className="bg-background/50 hover:bg-green-500/10 border-green-500/20"
+            >
+              <Download className="w-4 h-4 mr-2" />
+              Export
+            </Button>
+
+            <Button
+              variant="outline"
+              size="sm"
               onClick={onOpenAutomation}
               className="bg-background/50 hover:bg-background/80"
             >
               <Workflow className="w-4 h-4 mr-2" />
-              n8n Automation
+              n8n
             </Button>
 
             <Button
@@ -142,8 +168,8 @@ export const Header = ({
               size="sm"
               className="bg-gradient-primary hover:opacity-90 text-white border-0"
             >
-              <Plus className="w-4 h-4 mr-2" />
-              Create Analysis Report
+              <FileText className="w-4 h-4 mr-2" />
+              Report
             </Button>
           </div>
 
