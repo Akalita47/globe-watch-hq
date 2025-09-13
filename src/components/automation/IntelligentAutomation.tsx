@@ -92,7 +92,7 @@ export const IntelligentAutomation = ({ webhooks, events, rules }: IntelligentAu
             return event.title.toLowerCase().includes('cyber') && event.severity === 'critical';
           }
           if (pattern.id === '2') {
-            return event.severity === 'high' && event.location.region === 'Europe';
+            return event.severity === 'high' && event.location.country.includes('Ukraine');
           }
           return false;
         });
