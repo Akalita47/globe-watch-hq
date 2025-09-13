@@ -21,9 +21,10 @@ L.Marker.prototype.options.icon = L.icon({
 interface WorldMapProps {
   events: Event[];
   onEventClick?: (event: Event) => void;
+  selectedEventId?: string;
 }
 
-const createCustomIcon = (severity: SeverityLevel) => {
+const createCustomIcon = (severity: SeverityLevel, isSelected: boolean = false) => {
   const colors = {
     critical: '#ef4444',
     high: '#f97316',
@@ -31,19 +32,23 @@ const createCustomIcon = (severity: SeverityLevel) => {
     low: '#22c55e',
   } as const;
 
+  const size = isSelected ? 32 : 24;
+  const pulseClass = isSelected ? 'animate-pulse' : '';
+  
   const svgIcon = `
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="12" cy="12" r="8" fill="${colors[severity]}" stroke="white" stroke-width="2"/>
-      <circle cx="12" cy="12" r="4" fill="white" opacity="0.8"/>
+    <svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="${pulseClass}">
+      <circle cx="12" cy="12" r="8" fill="${colors[severity]}" stroke="white" stroke-width="${isSelected ? '3' : '2'}"/>
+      <circle cx="12" cy="12" r="4" fill="white" opacity="${isSelected ? '1' : '0.8'}"/>
+      ${isSelected ? '<circle cx="12" cy="12" r="10" fill="none" stroke="white" stroke-width="1" opacity="0.6"/>' : ''}
     </svg>
   `;
 
   return L.divIcon({
     html: svgIcon,
     className: 'custom-marker',
-    iconSize: [24, 24],
-    iconAnchor: [12, 12],
-    popupAnchor: [0, -12],
+    iconSize: [size, size],
+    iconAnchor: [size/2, size/2],
+    popupAnchor: [0, -size/2],
   });
 };
 
@@ -58,7 +63,7 @@ const formatTimeAgo = (date: Date) => {
   return `${days} day${days > 1 ? 's' : ''} ago`;
 };
 
-export const WorldMap: React.FC<WorldMapProps> = ({ events, onEventClick }) => {
+export const WorldMap: React.FC<WorldMapProps> = ({ events, onEventClick, selectedEventId }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<L.Map | null>(null);
   const markersLayerRef = useRef<L.LayerGroup | null>(null);
@@ -113,12 +118,13 @@ export const WorldMap: React.FC<WorldMapProps> = ({ events, onEventClick }) => {
     layer.clearLayers();
 
     events.forEach((event) => {
+      const isSelected = event.id === selectedEventId;
       const marker = L.marker(event.location.coordinates, {
-        icon: createCustomIcon(event.severity),
+        icon: createCustomIcon(event.severity, isSelected),
       });
 
       const popupHtml = `
-        <div class="p-2 min-w-[300px]">
+        <div class="p-2 min-w-[300px] max-w-[320px]">
           <div class="flex items-center gap-2 mb-2">
             <div class="w-3 h-3 rounded-full ${
               event.severity === 'critical'
@@ -132,7 +138,7 @@ export const WorldMap: React.FC<WorldMapProps> = ({ events, onEventClick }) => {
             <span class="text-xs font-medium uppercase tracking-wide text-muted-foreground">${event.severity}</span>
           </div>
           <h3 class="font-semibold text-sm mb-2 text-foreground">${event.title}</h3>
-          <p class="text-xs text-muted-foreground mb-3">${event.description}</p>
+          <p class="text-xs text-muted-foreground mb-3 line-clamp-3">${event.description}</p>
           <div class="flex items-center justify-between text-xs">
             <div class="flex items-center gap-1">
               <span class="font-medium text-primary">${event.source.name}</span>
@@ -141,13 +147,28 @@ export const WorldMap: React.FC<WorldMapProps> = ({ events, onEventClick }) => {
             </div>
             <span class="text-muted-foreground">${event.location.city}, ${event.location.country}</span>
           </div>
+          ${event.tags.length > 0 ? `
+            <div class="flex flex-wrap gap-1 mt-2">
+              ${event.tags.slice(0, 3).map(tag => `<span class="text-xs px-2 py-1 bg-secondary rounded text-secondary-foreground">${tag}</span>`).join('')}
+              ${event.tags.length > 3 ? `<span class="text-xs px-2 py-1 bg-muted rounded text-muted-foreground">+${event.tags.length - 3}</span>` : ''}
+            </div>
+          ` : ''}
         </div>`;
 
-      marker.bindPopup(popupHtml, { className: 'event-popup' });
+      marker.bindPopup(popupHtml, { 
+        className: 'event-popup',
+        maxWidth: 350,
+        closeButton: true
+      });
       marker.addTo(layer);
       marker.on('click', () => onEventClick?.(event));
+      
+      // Auto-open popup for selected event
+      if (isSelected) {
+        marker.openPopup();
+      }
     });
-  }, [events, onEventClick]);
+  }, [events, onEventClick, selectedEventId]);
 
   return <div ref={containerRef} className="h-full w-full rounded-lg overflow-hidden" />;
 };

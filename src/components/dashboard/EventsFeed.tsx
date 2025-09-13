@@ -64,7 +64,7 @@ export const EventsFeed = ({
   );
 
   return (
-    <div className="w-96 bg-card border-l border-border flex flex-col h-full">
+    <div className="w-full lg:w-96 bg-card border-t lg:border-t-0 lg:border-l border-border flex flex-col h-64 lg:h-full">
       {/* Header */}
       <div className="p-6 border-b border-border">
         <div className="flex items-center justify-between mb-4">
@@ -126,8 +126,8 @@ export const EventsFeed = ({
               <Card
                 key={event.id}
                 className={cn(
-                  "m-3 p-4 cursor-pointer transition-all duration-200 hover:shadow-glow border-border",
-                  selectedEventId === event.id && "ring-2 ring-primary shadow-glow"
+                  "m-2 lg:m-3 p-3 lg:p-4 cursor-pointer transition-all duration-300 hover:shadow-glow border-border hover:scale-[1.02] active:scale-[0.98]",
+                  selectedEventId === event.id && "ring-2 ring-primary shadow-glow bg-primary/5 animate-pulse"
                 )}
                 onClick={() => onEventSelect?.(event)}
               >

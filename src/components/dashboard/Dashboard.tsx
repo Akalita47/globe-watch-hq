@@ -119,37 +119,40 @@ export const Dashboard = () => {
         onOpenAutomation={() => setShowAutomationHub(true)}
       />
 
-      {/* Main Content */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* Left Sidebar - Filters & Analytics */}
-        <Sidebar
-          filters={filters}
-          onFiltersChange={setFilters}
-          events={filteredEvents}
-        />
+      {/* Main Content - Responsive Layout */}
+      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
+        {/* Left Sidebar - Filters & Analytics - Hidden on mobile, shown as drawer */}
+        <div className="hidden lg:block">
+          <Sidebar
+            filters={filters}
+            onFiltersChange={setFilters}
+            events={filteredEvents}
+          />
+        </div>
 
         {/* Center - World Map */}
-        <div className="flex-1 relative overflow-hidden">
-          <div className="absolute inset-0 p-4">
+        <div className="flex-1 relative overflow-hidden order-1 lg:order-none">
+          <div className="absolute inset-0 p-2 lg:p-4">
             <div className="h-full w-full rounded-lg overflow-hidden shadow-dashboard">
               <WorldMap 
                 events={filteredEvents}
                 onEventClick={handleEventClick}
+                selectedEventId={selectedEvent?.id}
               />
             </div>
           </div>
           
-          {/* Map Overlay - Selected Event Info */}
+          {/* Map Overlay - Selected Event Info - Responsive */}
           {selectedEvent && (
-            <div className="absolute top-6 right-6 w-80 bg-card border border-border rounded-lg shadow-dashboard p-4">
+            <div className="absolute top-2 left-2 right-2 lg:top-6 lg:right-6 lg:left-auto lg:w-80 bg-card border border-border rounded-lg shadow-dashboard p-4 animate-fade-in">
               <div className="flex items-center gap-2 mb-2">
-                <div className={`w-3 h-3 rounded-full bg-severity-${selectedEvent.severity}`} />
+                <div className={`w-3 h-3 rounded-full bg-severity-${selectedEvent.severity} animate-pulse`} />
                 <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                   {selectedEvent.severity}
                 </span>
                 <button 
                   onClick={() => setSelectedEvent(null)}
-                  className="ml-auto text-muted-foreground hover:text-foreground"
+                  className="ml-auto text-muted-foreground hover:text-foreground transition-colors p-1 hover:bg-muted rounded"
                 >
                   ✕
                 </button>
@@ -166,21 +169,23 @@ export const Dashboard = () => {
               <div className="text-xs text-muted-foreground">
                 <div className="flex items-center justify-between">
                   <span className="font-medium text-primary">{selectedEvent.source.name}</span>
-                  <span>{selectedEvent.location.city}, {selectedEvent.location.country}</span>
+                  <span className="text-right">{selectedEvent.location.city}, {selectedEvent.location.country}</span>
                 </div>
               </div>
             </div>
           )}
         </div>
 
-        {/* Right Sidebar - Events Feed */}
-        <EventsFeed
-          events={filteredEvents}
-          searchQuery={filters.searchQuery}
-          onSearchChange={(query) => setFilters({ ...filters, searchQuery: query })}
-          onEventSelect={handleEventClick}
-          selectedEventId={selectedEvent?.id}
-        />
+        {/* Right Sidebar - Events Feed - Responsive */}
+        <div className="order-2 lg:order-none">
+          <EventsFeed
+            events={filteredEvents}
+            searchQuery={filters.searchQuery}
+            onSearchChange={(query) => setFilters({ ...filters, searchQuery: query })}
+            onEventSelect={handleEventClick}
+            selectedEventId={selectedEvent?.id}
+          />
+        </div>
       </div>
 
       {/* n8n Automation Hub Modal */}
